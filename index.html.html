@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Generation Hope School | ፊዩቸር ጀነሬሽን ሆፕ ት/ቤት</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mammoth.js for Word DOCX parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <!-- PDF.js for PDF parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', 'Noto Sans Ethiopic', sans-serif; background-color: #f1f5f9; }
+        .modal { transition: opacity 0.25s ease; }
+        body.modal-active { overflow: hidden; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- TOP HEADER / NAVIGATION -->
+    <header class="bg-blue-700 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-white text-blue-700 p-2 rounded-xl shadow-sm flex items-center justify-center font-bold text-xl w-10 h-10">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 id="school-title" class="font-bold text-lg sm:text-xl leading-tight">Future Generation Hope School</h1>
+                    <p id="portal-subtitle" class="text-xs text-blue-100">School Management & Learning Portal</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- Language Toggle -->
+                <button onclick="toggleLanguage()" class="bg-blue-800 hover:bg-blue-900 text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-blue-500/30 flex items-center gap-2 transition">
+                    <i class="fa-solid fa-globe"></i>
+                    <span id="lang-btn-text">አማርኛ</span>
+                </button>
+
+                <!-- Current Account Status / Logout -->
+                <div id="user-badge" class="hidden items-center gap-2 bg-blue-800/80 px-3 py-1.5 rounded-lg text-xs">
+                    <i class="fa-solid fa-user-circle text-blue-200"></i>
+                    <span id="user-display-name" class="font-medium">User</span>
+                    <button onclick="logout()" class="ml-2 text-red-200 hover:text-red-100 font-bold" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+
+                <button id="main-login-btn" onclick="openModal('login-modal')" class="bg-white text-blue-700 font-semibold text-xs sm:text-sm px-3.5 py-1.5 rounded-lg shadow-sm hover:bg-blue-50 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span data-key="login">Login</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTENT AREA -->
+    <main class="max-w-7xl mx-auto w-full px-4 py-6 flex-1">
+
+        <!-- LANDING / HOME BANNER (Visible when logged out or on Home tab) -->
+        <div id="hero-banner" class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl text-white p-6 sm:p-8 mb-6 shadow-md relative overflow-hidden">
+            <div class="max-w-2xl relative z-10">
+                <span class="bg-blue-500/30 text-blue-100 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider mb-3 inline-block" data-key="officialPortal">
+                    Official Academic Portal
+                </span>
+                <h2 id="welcome-heading" class="text-2xl sm:text-3xl font-bold mb-2">Welcome to Future Generation Hope School</h2>
+                <p id="welcome-sub" class="text-blue-100 text-sm sm:text-base leading-relaxed mb-6">
+                    Empowering students through quality education, transparent grading, direct teacher communication, and secure administrative oversight.
+                </p>
+                
+                <div class="flex flex-wrap gap-3" id="portal-buttons">
+                    <button onclick="openPortalLogin('student')" class="bg-white text-blue-700 hover:bg-blue-50 font-medium px-4 py-2 rounded-xl shadow-sm text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-user-graduate"></i> <span data-key="studentPortal">Student Portal</span>
+                    </button>
+                    <button onclick="openPortalLogin('teacher')" class="bg-blue-800/80 text-white hover:bg-blue-800 font-medium px-4 py-2 rounded-xl text-sm flex items-center gap-2 border border-blue-400/30">
+                        <i class="fa-solid fa-chalkboard-user"></i> <span data-key="teacherPortal">Teacher Portal</span>
+                    </button>
+                    <button onclick="openPortalLogin('principal')" class="bg-slate-900/80 text-white hover:bg-slate-900 font-medium px-4 py-2 rounded-xl text-sm flex items-center gap-2 border border-slate-700">
+                        <i class="fa-solid fa-user-shield"></i> <span data-key="principalPortal">Principal Portal</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRINCIPAL ANNOUNCEMENTS BOARD -->
+        <section class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 mb-6">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-bullhorn text-blue-600"></i>
+                    <span data-key="announcementsTitle">School Announcements</span>
+                </h3>
+                <button id="add-announcement-btn" onclick="openModal('announcement-modal')" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-plus"></i> <span data-key="addAnnouncement">Add Announcement</span>
+                </button>
+            </div>
+
+            <div id="announcements-container" class="space-y-3">
+                <!-- Dynamically Populated or Empty State -->
+            </div>
+        </section>
+
+        <!-- STUDENT/TEACHER DASHBOARD TABS (Dynamic view after login) -->
+        <div id="authenticated-view" class="hidden space-y-6">
+            <!-- Navigation Tabs for Student -->
+            <nav id="student-nav" class="hidden flex gap-2 border-b border-slate-200 pb-2">
+                <button onclick="switchTab('student-home')" id="tab-btn-student-home" class="tab-btn active bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-house"></i> <span data-key="navHome">Home</span>
+                </button>
+                <button onclick="switchTab('student-chat')" id="tab-btn-student-chat" class="tab-btn bg-white text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 border">
+                    <i class="fa-solid fa-comments"></i> <span data-key="navChat">Chat</span>
+                </button>
+                <button onclick="switchTab('student-profile')" id="tab-btn-student-profile" class="tab-btn bg-white text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 border">
+                    <i class="fa-solid fa-id-card"></i> <span data-key="navProfile">Profile & Grades</span>
+                </button>
+            </nav>
+
+            <!-- STUDENT PROFILE & GRADES SECTION -->
+            <section id="student-profile" class="tab-content hidden space-y-6">
+                <!-- Passcode Grade Unlock Card -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                    <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-lock text-blue-600"></i>
+                        <span data-key="gradeUnlockTitle">View Test Results</span>
+                    </h4>
+                    <p class="text-xs text-slate-500 mb-4" data-key="gradeUnlockSub">Enter your grade viewing passcode to reveal your test scores published by teachers.</p>
+                    
+                    <div class="flex gap-2 max-w-sm">
+                        <input type="password" id="student-grade-passcode-input" placeholder="Enter Grade Passcode" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <button onclick="verifyGradePasscode()" class="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-blue-700 transition">
+                            <span data-key="viewResults">View</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grades Table -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 overflow-hidden">
+                    <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-file-lines text-blue-600"></i>
+                        <span data-key="academicGrades">Academic Grade History</span>
+                    </h4>
+                    
+                    <div id="grades-wrapper" class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-600">
+                            <thead class="text-xs uppercase bg-slate-50 text-slate-700 border-b">
+                                <tr>
+                                    <th class="px-4 py-3" data-key="subject">Subject</th>
+                                    <th class="px-4 py-3" data-key="testTitle">Test Title</th>
+                                    <th class="px-4 py-3" data-key="score">Score</th>
+                                    <th class="px-4 py-3" data-key="date">Date Uploaded</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-grades-list">
+                                <tr>
+                                    <td colspan="4" class="px-4 py-6 text-center text-slate-400 italic" data-key="noGradesYet">
+                                        Enter your correct passcode above to unlock your test results.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CHAT INTERFACE FOR STUDENTS & TEACHERS -->
+            <section id="student-chat" class="tab-content hidden bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm h-[500px] flex">
+                <!-- Sidebar (Contacts) -->
+                <div class="w-1/3 sm:w-1/4 border-r border-slate-200 bg-slate-50 flex flex-col">
+                    <div class="p-3 border-b border-slate-200 font-semibold text-xs text-slate-500 uppercase tracking-wider" id="chat-sidebar-header">
+                        Teachers List
+                    </div>
+                    <div id="chat-users-list" class="flex-1 overflow-y-auto divide-y divide-slate-100">
+                        <!-- Contacts dynamically rendered here -->
+                    </div>
+                </div>
+
+                <!-- Chat Window -->
+                <div class="w-2/3 sm:w-3/4 flex flex-col bg-white">
+                    <div class="p-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+                        <span id="active-chat-partner" class="font-bold text-sm text-slate-800">Select a contact to chat</span>
+                        <span id="anonymous-tag" class="hidden text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium">Anonymous Student Mode</span>
+                    </div>
+                    <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/50">
+                        <div class="text-center text-xs text-slate-400 py-10" data-key="selectChatPrompt">
+                            Select a user from the list to start messaging.
+                        </div>
+                    </div>
+                    <div class="p-3 border-t border-slate-200 flex gap-2 bg-white">
+                        <input type="text" id="chat-message-input" placeholder="Type a message..." class="flex-1 text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="sendChatMessage()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TEACHER HOME DASHBOARD -->
+            <section id="teacher-dashboard" class="hidden space-y-6">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg" data-key="teacherActions">Teacher Quick Actions</h3>
+                        <p class="text-xs text-slate-500" data-key="teacherPrivacyNotice">Student identities are automatically anonymized as "Student A-10" format for grade entry privacy.</p>
+                    </div>
+                    <button onclick="openModal('upload-test-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-4 py-2 rounded-xl shadow-sm flex items-center gap-2">
+                        <i class="fa-solid fa-file-circle-plus"></i> <span data-key="addTestResults">Add Test Results</span>
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <!-- QUICK NAV / ACCOUNT REGISTRATION ACTIONS (Logged Out or Quick Access) -->
+        <div id="quick-signup-grid" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:border-blue-300 transition cursor-pointer" onclick="openModal('register-student-modal')">
+                <div class="text-blue-600 text-xl mb-2"><i class="fa-solid fa-user-plus"></i></div>
+                <h4 class="font-bold text-slate-800 text-sm mb-1" data-key="newStudentReg">New Student Account Sign Up</h4>
+                <p class="text-xs text-slate-500" data-key="studentRegDesc">Create an account with your full name, student ID, grade level, and secret passcode.</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:border-blue-300 transition cursor-pointer" onclick="openModal('register-teacher-modal')">
+                <div class="text-blue-600 text-xl mb-2"><i class="fa-solid fa-chalkboard-user"></i></div>
+                <h4 class="font-bold text-slate-800 text-sm mb-1" data-key="newTeacherReg">New Teacher Registration (Max 23)</h4>
+                <p class="text-xs text-slate-500" data-key="teacherRegDesc">Join the faculty staff. Account creation is restricted to 23 authorized teachers maximum.</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:border-blue-300 transition cursor-pointer" onclick="openModal('register-principal-modal')">
+                <div class="text-blue-600 text-xl mb-2"><i class="fa-solid fa-user-shield"></i></div>
+                <h4 class="font-bold text-slate-800 text-sm mb-1" data-key="principalAccount">Create Principal Account (One Only)</h4>
+                <p class="text-xs text-slate-500" data-key="principalRegDesc">Single administrative setup card for head principal access and oversight.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FLOATING REPORT FLAG BUTTON (For Principal & Students) -->
+    <div id="floating-report-container" class="fixed bottom-6 right-6 z-30">
+        <button id="report-flag-btn" onclick="openModal('report-modal')" class="bg-red-500 hover:bg-red-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105" title="Student Feedback / Principal Reports">
+            <i class="fa-solid fa-flag"></i>
+        </button>
+    </div>
+
+    <!-- MODAL POPUPS -->
+
+    <!-- 1. UNIVERSAL LOGIN MODAL -->
+    <div id="login-modal" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 relative">
+            <button onclick="closeModal('login-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            <h3 class="text-lg font-bold text-slate-800 mb-1" data-key="loginHeader">Sign In to Your Account</h3>
+            <p class="text-xs text-slate-500 mb-4" data-key="loginSub">Select your role and enter credentials to continue.</p>
+
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1" data-key="role">Role</label>
+                    <select id="login-role" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="principal">Principal</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1" data-key="usernameOrId">Username / Student ID</label>
+                    <input type="text" id="login-username" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Username or Student ID">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1" data-key="passcode">Passcode / Password</label>
+                    <input type="password" id="login-password" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-xl shadow-sm transition">
+                    <span data-key="signInBtn">Sign In</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. STUDENT REGISTRATION MODAL -->
+    <div id="register-student-modal" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 relative">
+            <button onclick="closeModal('register-student-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Create Student Account</h3>
+            <p class="text-xs text-slate-500 mb-4">Set up your profile and specific passcode to unlock test results later.</p>
+
+            <form onsubmit="handleRegisterStudent(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Full Name</label>
+                    <input type="text" id="reg-student-name" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Grade Level (e.g., 10)</label>
+                    <input type="number" id="reg-student-grade" min="1" max="12" required value="10" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Account Username</label>
+                    <input type="text" id="reg-student-username" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Login Password</label>
+                    <input type="password" id="reg-student-password" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Secret Passcode for Results Lookup</label>
+                    <input type="password" id="reg-student-grade-passcode" required placeholder="e.g. 4321" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-xl shadow-sm transition">
+                    Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. TEACHER REGISTRATION MODAL -->
+    <div id="register-teacher-modal" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 relative">
+            <button onclick="closeModal('register-teacher-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Teacher Account Setup</h3>
+            <p class="text-xs text-slate-500 mb-4">Registration limited to maximum 23 teachers.</p>
+
+            <form onsubmit="handleRegisterTeacher(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Full Name</label>
+                    <input type="text" id="reg-teacher-name" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Subject (e.g., Mathematics)</label>
+                    <input type="text" id="reg-teacher-subject" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
+                    <input type="text" id="reg-teacher-username" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                    <input type="password" id="reg-teacher-password" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-xl shadow-sm transition">
+                    Register Teacher
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. PRINCIPAL REGISTRATION MODAL -->
+    <div id="register-principal-modal" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 relative">
+            <button onclick="closeModal('register-principal-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Create Principal Account</h3>
+            <p class="text-xs text-slate-500 mb-4">Note: Principal Thomas is already pre-registered (`Thomas` / `123456789`).</p>
+
+            <form onsubmit="handleRegisterPrincipal(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Principal Name</label>
+                    <input type="text" id="reg-principal-name" required value="Thomas" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
+                    <input type="text" id="reg-principal-username" required value="Thomas" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                    <input type="password" id="reg-principal-password" required value="123456789" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-xl shadow-sm transition">
+                    Save Principal Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. ANNOUNCEMENT CREATION MODAL -->
+    <div id="announcement-modal" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 relative">
+            <button onclick="closeModal('announcement-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Post Principal Announcement</h3>
+            <p class="text-xs text-slate-500 mb-4">Broadcast an official update to all school members.</p>
+
+            <form onsubmit="handlePostAnnouncement(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Title</label>
+                    <input type="text" id="announcement-title" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Content</label>
+                    <textarea id="announcement-body" rows="4" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-xl shadow-sm transition">
+                    Post Announcement
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 6. TEACHER UPLOAD TEST RESULTS MODAL -->
+    <div id="upload-test-modal" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100 relative">
+            <button onclick="closeModal('upload-test-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Publish Test Results</h3>
+            <p class="text-xs text-slate-500 mb-4">Upload a document (.pdf, .docx, .txt, .csv) or enter student scores manually.</p>
+
+            <form onsubmit="handleUploadTestResults(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Test Title</label>
+                        <input type="text" id="test-title-input" placeholder="Midterm Exam" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Subject</label>
+                        <input type="text" id="test-subject-input" placeholder="Mathematics" required class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Scan Document (Optional - .pdf, .docx, .txt, .csv)</label>
+                    <input type="file" id="test-file-input" accept=".pdf,.docx,.txt,.csv" class="w-full text-xs text-slate-500 border border-slate-300 rounded-xl px-3 py-2 bg-slate-50">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Student Results List (Format: Username / Score)</label>
+                    <textarea id="test-manual-scores" rows="4" placeholder="Student1, 88%&#10;Student2, 94%" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-xl shadow-sm transition">
+                    Upload & Publish Grades
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 7. REPORT FLAG MODAL -->
+    <div id="report-modal" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 relative">
+            <button onclick="closeModal('report-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            <h3 class="text-lg font-bold text-slate-800 mb-1" id="report-modal-title">Student Feedback & Reports</h3>
+            
+            <div id="report-submit-view">
+                <p class="text-xs text-slate-500 mb-4">Send a direct confidential message or concern to Principal Thomas.</p>
+                <form onsubmit="handleSendReport(event)" class="space-y-3">
+                    <textarea id="report-text-input" rows="4" required placeholder="Type your issue or feedback..." class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2.5 rounded-xl shadow-sm transition">
+                        Submit Report
+                    </button>
+                </form>
+            </div>
+
+            <div id="report-principal-view" class="hidden space-y-3">
+                <p class="text-xs text-slate-500 mb-2">Confidential student feedback inbox:</p>
+                <div id="principal-reports-list" class="max-h-60 overflow-y-auto space-y-2 text-xs">
+                    <!-- Dynamic reports -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast" class="fixed top-5 right-5 bg-slate-800 text-white text-xs px-4 py-3 rounded-xl shadow-xl transform translate-y-[-100px] opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+        <i id="toast-icon" class="fa-solid fa-circle-info text-blue-400"></i>
+        <span id="toast-message">Notification message</span>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-4">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            &copy; 2026 Future Generation Hope School (ፊዩቸር ጀነሬሽን ሆፕ ት/ቤት). All rights reserved.
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // --- TRANSLATIONS (English / Amharic) ---
+        const translations = {
+            en: {
+                schoolTitle: "Future Generation Hope School",
+                portalSubtitle: "School Management & Learning Portal",
+                officialPortal: "Official Academic Portal",
+                welcomeHeading: "Welcome to Future Generation Hope School",
+                welcomeSub: "Empowering students through quality education, transparent grading, direct teacher communication, and secure administrative oversight.",
+                studentPortal: "Student Portal",
+                teacherPortal: "Teacher Portal",
+                principalPortal: "Principal Portal",
+                announcementsTitle: "School Announcements",
+                addAnnouncement: "Add Announcement",
+                navHome: "Home",
+                navChat: "Chat",
+                navProfile: "Profile & Grades",
+                gradeUnlockTitle: "View Test Results",
+                gradeUnlockSub: "Enter your grade viewing passcode to reveal your test scores published by teachers.",
+                viewResults: "View",
+                academicGrades: "Academic Grade History",
+                subject: "Subject",
+                testTitle: "Test Title",
+                score: "Score",
+                date: "Date Uploaded",
+                noGradesYet: "Enter your correct passcode above to unlock your test results.",
+                selectChatPrompt: "Select a user from the list to start messaging.",
+                teacherActions: "Teacher Quick Actions",
+                teacherPrivacyNotice: "Student identities are automatically anonymized as 'Student A-10' format for grade entry privacy.",
+                addTestResults: "Add Test Results",
+                newStudentReg: "New Student Account Sign Up",
+                studentRegDesc: "Create an account with your full name, student ID, grade level, and secret passcode.",
+                newTeacherReg: "New Teacher Registration (Max 23)",
+                teacherRegDesc: "Join the faculty staff. Account creation is restricted to 23 authorized teachers maximum.",
+                principalAccount: "Create Principal Account (One Only)",
+                principalRegDesc: "Single administrative setup card for head principal access and oversight.",
+                loginHeader: "Sign In to Your Account",
+                loginSub: "Select your role and enter credentials to continue.",
+                role: "Role",
+                usernameOrId: "Username / Student ID",
+                passcode: "Passcode / Password",
+                signInBtn: "Sign In",
+                login: "Login"
+            },
+            am: {
+                schoolTitle: "ፊዩቸር ጀነሬሽን ሆፕ ት/ቤት",
+                portalSubtitle: "የትምህርት ቤት ማኔጅመንት እና የመማሪያ ፖርታል",
+                officialPortal: "ኦፊሴላዊ የትምህርት ፖርታል",
+                welcomeHeading: "እንኳን ወደ ፊዩቸር ጀነሬሽን ሆፕ ት/ቤት በደህና መጡ",
+                welcomeSub: "ተማሪዎችን በጥራት ትምህርት፣ በግልጽ የውጤት አሰጣጥ እና በቀጥታ የመምህራን ግንኙነት ማብቃት።",
+                studentPortal: "የተማሪ ፖርታል",
+                teacherPortal: "የመምህራን ፖርታል",
+                principalPortal: "የርእሰ መምህር ፖርታል",
+                announcementsTitle: "የትምህርት ቤት ማስታወቂያዎች",
+                addAnnouncement: "ማስታወቂያ ጨምር",
+                navHome: "ዋና ገጽ",
+                navChat: "ውይይት (ቻት)",
+                navProfile: "ፕሮፋይል እና ውጤቶች",
+                gradeUnlockTitle: "የፈተና ውጤቶችን ይመልከቱ",
+                gradeUnlockSub: "በመምህራን የተለቀቁ የፈተና ውጤቶችን ለማየት ምስጢር የይለፍ ቃልዎን ያስገቡ።",
+                viewResults: "ተመልከት",
+                academicGrades: "የቀደሙ የትምህርት ውጤቶች",
+                subject: "ትምህርት",
+                testTitle: "የፈተናው ርዕስ",
+                score: "ውጤት",
+                date: "የተለቀቀበት ቀን",
+                noGradesYet: "የፈተና ውጤቶችን ለማየት ከላይ ትክክለኛ የይለፍ ቃልዎን ያስገቡ።",
+                selectChatPrompt: "መልእክት ለመላክ ከዝርዝሩ ውስጥ ተጠቃሚ ይምረጡ።",
+                teacherActions: "የመምህራን ፈጣን ተግባራት",
+                teacherPrivacyNotice: "ለደህንነት ሲባል የተማሪዎች ማንነት 'Student A-10' ተብሎ በምስጢር ተደብቋል።",
+                addTestResults: "የፈተና ውጤት ጨምር",
+                newStudentReg: "አዲስ የተማሪ መለያ ክፈት",
+                studentRegDesc: "በሙሉ ስምዎ፣ በተማሪ መለያዎ እና በምስጢር የይለፍ ቃልዎ መለያ ይክፈቱ።",
+                newTeacherReg: "አዲስ የመምህር ምዝገባ (ከ23 ያልበለጠ)",
+                teacherRegDesc: "የመምህራን አባል ይሁኑ። የምዝገባ ገደቡ እስከ 23 መምህራን ብቻ ነው።",
+                principalAccount: "የርእሰ መምህር መለያ (አንድ ብቻ)",
+                principalRegDesc: "የርእሰ መምህሩ ዋና አስተዳዳሪ መለያ ማዋቀሪያ።",
+                loginHeader: "ወደ መለያዎ ይግቡ",
+                loginSub: "ለመቀጠል ሚናዎን ይምረጡ እና ምስጢር ቃልዎን ያስገቡ።",
+                role: "ሚና",
+                usernameOrId: "የተጠቃሚ ስም / የተማሪ ID",
+                passcode: "የይለፍ ቃል",
+                signInBtn: "ግለጽ / ግባ",
+                login: "መግቢያ"
+            }
+        };
+
+        let currentLang = 'en';
+        let currentUser = null;
+        let activeChatPartner = null;
+
+        // --- LOCAL STORAGE DATA MODEL ---
+        function getStorage(key, fallback = []) {
+            return JSON.parse(localStorage.getItem(key)) || fallback;
+        }
+
+        function setStorage(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        // Initialize default storage with pre-registered Principal Thomas
+        function initAppStorage() {
+            if (!localStorage.getItem('fghs_principal')) {
+                setStorage('fghs_principal', {
+                    name: 'Thomas',
+                    username: 'Thomas',
+                    password: '123456789'
+                });
+            }
+            if (!localStorage.getItem('fghs_students')) setStorage('fghs_students', []);
+            if (!localStorage.getItem('fghs_teachers')) setStorage('fghs_teachers', []);
+            if (!localStorage.getItem('fghs_announcements')) setStorage('fghs_announcements', []);
+            if (!localStorage.getItem('fghs_grades')) setStorage('fghs_grades', []);
+            if (!localStorage.getItem('fghs_messages')) setStorage('fghs_messages', []);
+            if (!localStorage.getItem('fghs_reports')) setStorage('fghs_reports', []);
+        }
+
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            initAppStorage();
+            renderAnnouncements();
+        });
+
+        // --- UI MODAL HANDLERS ---
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            document.body.classList.add('modal-active');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            document.body.classList.remove('modal-active');
+        }
+
+        function openPortalLogin(role) {
+            document.getElementById('login-role').value = role;
+            openModal('login-modal');
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+
+            msg.textContent = message;
+            icon.className = isError ? 'fa-solid fa-triangle-exclamation text-red-400' : 'fa-solid fa-circle-check text-emerald-400';
+            
+            toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-100px]', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- LANGUAGE TOGGLE ---
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'am' : 'en';
+            document.getElementById('lang-btn-text').textContent = currentLang === 'en' ? 'አማርኛ' : 'English';
+            
+            // Translate text content
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+
+            // Update School Heading Title
+            document.getElementById('school-title').textContent = translations[currentLang].schoolTitle;
+            document.getElementById('portal-subtitle').textContent = translations[currentLang].portalSubtitle;
+            document.getElementById('welcome-heading').textContent = translations[currentLang].welcomeHeading;
+            document.getElementById('welcome-sub').textContent = translations[currentLang].welcomeSub;
+        }
+
+        // --- AUTHENTICATION HANDLERS ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const role = document.getElementById('login-role').value;
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            if (role === 'principal') {
+                const principal = getStorage('fghs_principal', {});
+                if (username === principal.username && password === principal.password) {
+                    currentUser = { role: 'principal', name: principal.name };
+                    showToast('Welcome Principal ' + principal.name);
+                    closeModal('login-modal');
+                    setupUserDashboard();
+                    return;
+                }
+            } else if (role === 'teacher') {
+                const teachers = getStorage('fghs_teachers', []);
+                const teacher = teachers.find(t => t.username === username && t.password === password);
+                if (teacher) {
+                    currentUser = { role: 'teacher', ...teacher };
+                    showToast('Welcome Teacher ' + teacher.name);
+                    closeModal('login-modal');
+                    setupUserDashboard();
+                    return;
+                }
+            } else if (role === 'student') {
+                const students = getStorage('fghs_students', []);
+                const student = students.find(s => s.username === username && s.password === password);
+                if (student) {
+                    currentUser = { role: 'student', ...student };
+                    showToast('Welcome ' + student.name);
+                    closeModal('login-modal');
+                    setupUserDashboard();
+                    return;
+                }
+            }
+
+            showToast('Invalid credentials or account not found!', true);
+        }
+
+        function setupUserDashboard() {
+            document.getElementById('main-login-btn').classList.add('hidden');
+            document.getElementById('user-badge').classList.remove('hidden');
+            document.getElementById('user-badge').classList.add('flex');
+            document.getElementById('user-display-name').textContent = currentUser.name;
+            document.getElementById('authenticated-view').classList.remove('hidden');
+            document.getElementById('quick-signup-grid').classList.add('hidden');
+
+            if (currentUser.role === 'principal') {
+                document.getElementById('add-announcement-btn').classList.remove('hidden');
+                document.getElementById('report-submit-view').classList.add('hidden');
+                document.getElementById('report-principal-view').classList.remove('hidden');
+                document.getElementById('report-modal-title').textContent = 'Principal Reports Inbox';
+                renderPrincipalReports();
+            } else if (currentUser.role === 'student') {
+                document.getElementById('student-nav').classList.remove('hidden');
+                switchTab('student-home');
+                renderChatContacts();
+            } else if (currentUser.role === 'teacher') {
+                document.getElementById('student-nav').classList.remove('hidden');
+                document.getElementById('teacher-dashboard').classList.remove('hidden');
+                switchTab('student-chat');
+                renderChatContacts();
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('user-badge').classList.add('hidden');
+            document.getElementById('main-login-btn').classList.remove('hidden');
+            document.getElementById('authenticated-view').classList.add('hidden');
+            document.getElementById('student-nav').classList.add('hidden');
+            document.getElementById('teacher-dashboard').classList.add('hidden');
+            document.getElementById('add-announcement-btn').classList.add('hidden');
+            document.getElementById('quick-signup-grid').classList.remove('hidden');
+            showToast('Logged out successfully');
+        }
+
+        // --- ACCOUNT CREATION ---
+        function handleRegisterStudent(e) {
+            e.preventDefault();
+            const students = getStorage('fghs_students', []);
+            const newStudent = {
+                id: 'S-' + Math.floor(1000 + Math.random() * 9000),
+                name: document.getElementById('reg-student-name').value.trim(),
+                grade: document.getElementById('reg-student-grade').value.trim(),
+                username: document.getElementById('reg-student-username').value.trim(),
+                password: document.getElementById('reg-student-password').value.trim(),
+                gradePasscode: document.getElementById('reg-student-grade-passcode').value.trim()
+            };
+
+            students.push(newStudent);
+            setStorage('fghs_students', students);
+            showToast('Student account registered successfully!');
+            closeModal('register-student-modal');
+        }
+
+        function handleRegisterTeacher(e) {
+            e.preventDefault();
+            const teachers = getStorage('fghs_teachers', []);
+            if (teachers.length >= 23) {
+                showToast('Teacher limit reached! Maximum 23 teachers allowed.', true);
+                return;
+            }
+
+            const newTeacher = {
+                id: 'T-' + (teachers.length + 1),
+                name: document.getElementById('reg-teacher-name').value.trim(),
+                subject: document.getElementById('reg-teacher-subject').value.trim(),
+                username: document.getElementById('reg-teacher-username').value.trim(),
+                password: document.getElementById('reg-teacher-password').value.trim()
+            };
+
+            teachers.push(newTeacher);
+            setStorage('fghs_teachers', teachers);
+            showToast('Teacher account created (' + teachers.length + '/23)');
+            closeModal('register-teacher-modal');
+        }
+
+        function handleRegisterPrincipal(e) {
+            e.preventDefault();
+            const principal = {
+                name: document.getElementById('reg-principal-name').value.trim(),
+                username: document.getElementById('reg-principal-username').value.trim(),
+                password: document.getElementById('reg-principal-password').value.trim()
+            };
+            setStorage('fghs_principal', principal);
+            showToast('Principal account updated successfully!');
+            closeModal('register-principal-modal');
+        }
+
+        // --- TAB SWITCHING ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-white', 'text-slate-600');
+            });
+
+            if (tabId === 'student-home') {
+                document.getElementById('hero-banner').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('tab-btn-student-home').classList.add('bg-blue-600', 'text-white');
+            } else {
+                const target = document.getElementById(tabId);
+                if (target) target.classList.remove('hidden');
+                const btn = document.getElementById('tab-btn-' + tabId);
+                if (btn) {
+                    btn.classList.remove('bg-white', 'text-slate-600');
+                    btn.classList.add('bg-blue-600', 'text-white');
+                }
+            }
+        }
+
+        // --- ANNOUNCEMENTS ---
+        function handlePostAnnouncement(e) {
+            e.preventDefault();
+            const announcements = getStorage('fghs_announcements', []);
+            const newAnn = {
+                title: document.getElementById('announcement-title').value.trim(),
+                body: document.getElementById('announcement-body').value.trim(),
+                date: new Date().toLocaleDateString()
+            };
+            announcements.unshift(newAnn);
+            setStorage('fghs_announcements', announcements);
+            renderAnnouncements();
+            closeModal('announcement-modal');
+            showToast('Announcement published!');
+        }
+
+        function renderAnnouncements() {
+            const container = document.getElementById('announcements-container');
+            const announcements = getStorage('fghs_announcements', []);
+            if (announcements.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic py-4 text-center">No official announcements posted yet.</p>`;
+                return;
+            }
+            container.innerHTML = announcements.map(ann => `
+                <div class="p-4 bg-slate-50 border border-slate-200/60 rounded-xl">
+                    <div class="flex justify-between items-center mb-1">
+                        <h4 class="font-bold text-slate-800 text-sm">${ann.title}</h4>
+                        <span class="text-[10px] text-slate-400"><i class="fa-regular fa-clock"></i> ${ann.date}</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">${ann.body}</p>
+                </div>
+            `).join('');
+        }
+
+        // --- GRADE PASSCODE & RESULTS LOOKUP ---
+        function verifyGradePasscode() {
+            if (!currentUser || currentUser.role !== 'student') return;
+            const inputCode = document.getElementById('student-grade-passcode-input').value.trim();
+            if (inputCode === currentUser.gradePasscode) {
+                showToast('Passcode verified! Loading grades...');
+                renderStudentGrades();
+            } else {
+                showToast('Incorrect passcode for viewing grades!', true);
+            }
+        }
+
+        function renderStudentGrades() {
+            const gradesList = getStorage('fghs_grades', []);
+            const myGrades = gradesList.filter(g => g.username === currentUser.username);
+            const tbody = document.getElementById('student-grades-list');
+
+            if (myGrades.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-4 text-center text-xs text-slate-400 italic">No published grades found for your profile.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = myGrades.map(g => `
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="px-4 py-3 font-semibold text-slate-700">${g.subject}</td>
+                    <td class="px-4 py-3">${g.title}</td>
+                    <td class="px-4 py-3 font-bold text-blue-600">${g.score}</td>
+                    <td class="px-4 py-3 text-xs text-slate-400">${g.date}</td>
+                </tr>
+            `).join('');
+        }
+
+        // --- TEACHER UPLOAD TEST RESULTS ---
+        function handleUploadTestResults(e) {
+            e.preventDefault();
+            const title = document.getElementById('test-title-input').value.trim();
+            const subject = document.getElementById('test-subject-input').value.trim();
+            const rawScores = document.getElementById('test-manual-scores').value.trim();
+            const grades = getStorage('fghs_grades', []);
+
+            const lines = rawScores.split('\n');
+            lines.forEach(line => {
+                const parts = line.split(',');
+                if (parts.length >= 2) {
+                    grades.push({
+                        username: parts[0].trim(),
+                        score: parts[1].trim(),
+                        title: title,
+                        subject: subject,
+                        date: new Date().toLocaleDateString()
+                    });
+                }
+            });
+
+            setStorage('fghs_grades', grades);
+            showToast('Test results published successfully!');
+            closeModal('upload-test-modal');
+        }
+
+        // --- CHAT INTERFACE ---
+        function renderChatContacts() {
+            const container = document.getElementById('chat-users-list');
+            if (currentUser.role === 'student') {
+                const teachers = getStorage('fghs_teachers', []);
+                container.innerHTML = teachers.map(t => `
+                    <div onclick="selectChatPartner('${t.username}', '${t.name}')" class="p-3 hover:bg-blue-50 cursor-pointer transition">
+                        <div class="font-bold text-xs text-slate-800">${t.name}</div>
+                        <div class="text-[10px] text-slate-400">${t.subject}</div>
+                    </div>
+                `).join('');
+            } else if (currentUser.role === 'teacher') {
+                const students = getStorage('fghs_students', []);
+                container.innerHTML = students.map(s => `
+                    <div onclick="selectChatPartner('${s.username}', 'Student A-${s.grade}')" class="p-3 hover:bg-blue-50 cursor-pointer transition">
+                        <div class="font-bold text-xs text-slate-800">Student A-${s.grade}</div>
+                        <div class="text-[10px] text-slate-400">Anonymous ID: ${s.id}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function selectChatPartner(username, displayName) {
+            activeChatPartner = { username, displayName };
+            document.getElementById('active-chat-partner').textContent = displayName;
+            if (currentUser.role === 'teacher') {
+                document.getElementById('anonymous-tag').classList.remove('hidden');
+            }
+            renderChatMessages();
+        }
+
+        function renderChatMessages() {
+            if (!activeChatPartner) return;
+            const allMessages = getStorage('fghs_messages', []);
+            const chatBox = document.getElementById('chat-messages');
+
+            const relevantMsgs = allMessages.filter(m => 
+                (m.from === currentUser.username && m.to === activeChatPartner.username) ||
+                (m.from === activeChatPartner.username && m.to === currentUser.username)
+            );
+
+            if (relevantMsgs.length === 0) {
+                chatBox.innerHTML = `<div class="text-center text-xs text-slate-400 py-8">No messages yet. Say hello!</div>`;
+                return;
+            }
+
+            chatBox.innerHTML = relevantMsgs.map(m => {
+                const isMine = m.from === currentUser.username;
+                return `
+                    <div class="flex flex-col ${isMine ? 'items-end' : 'items-start'}">
+                        <div class="${isMine ? 'bg-blue-600 text-white' : 'bg-white text-slate-800 border'} p-2.5 rounded-2xl max-w-xs text-xs shadow-sm">
+                            ${m.text}
+                        </div>
+                        <span class="text-[9px] text-slate-400 mt-1">${m.time}</span>
+                    </div>
+                `;
+            }).join('');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            if (!activeChatPartner) {
+                showToast('Please select a contact to chat with first!', true);
+                return;
+            }
+            const input = document.getElementById('chat-message-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const allMessages = getStorage('fghs_messages', []);
+            allMessages.push({
+                from: currentUser.username,
+                to: activeChatPartner.username,
+                text: text,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+
+            setStorage('fghs_messages', allMessages);
+            input.value = '';
+            renderChatMessages();
+        }
+
+        // --- REPORTS ---
+        function handleSendReport(e) {
+            e.preventDefault();
+            const text = document.getElementById('report-text-input').value.trim();
+            const reports = getStorage('fghs_reports', []);
+            reports.push({
+                text: text,
+                date: new Date().toLocaleDateString(),
+                sender: currentUser ? currentUser.name : 'Anonymous Student'
+            });
+            setStorage('fghs_reports', reports);
+            showToast('Report submitted confidentially to Principal.');
+            closeModal('report-modal');
+        }
+
+        function renderPrincipalReports() {
+            const reports = getStorage('fghs_reports', []);
+            const container = document.getElementById('principal-reports-list');
+            if (reports.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 italic">No reports received.</p>`;
+                return;
+            }
+            container.innerHTML = reports.map(r => `
+                <div class="p-2.5 bg-slate-50 border rounded-lg">
+                    <div class="font-semibold text-slate-700">${r.sender} <span class="text-[10px] text-slate-400">(${r.date})</span></div>
+                    <p class="text-slate-600 mt-1">${r.text}</p>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
